@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include qlip_moto_oriente *.css
+recursive-include qlip_moto_oriente *.csv
+recursive-include qlip_moto_oriente *.html
+recursive-include qlip_moto_oriente *.ico
+recursive-include qlip_moto_oriente *.js
+recursive-include qlip_moto_oriente *.json
+recursive-include qlip_moto_oriente *.md
+recursive-include qlip_moto_oriente *.png
+recursive-include qlip_moto_oriente *.py
+recursive-include qlip_moto_oriente *.svg
+recursive-include qlip_moto_oriente *.txt
+recursive-exclude qlip_moto_oriente *.pyc
