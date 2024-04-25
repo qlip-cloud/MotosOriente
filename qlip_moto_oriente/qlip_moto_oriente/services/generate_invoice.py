@@ -57,7 +57,6 @@ def generate_sales_invoice(values):
   si = {
     'doctype': 'Sales Invoice',
     'company': company,
-    'sequence':'1',
     'customer': customer.name,
     'numero_de_placa':values.get('numero_de_placa'),
     'tipo_de_venta':'Compilado',
