@@ -70,7 +70,7 @@ def generate_sales_invoice(values):
     'posting_time': get_time(datetime.now()),
     'items':items,
     "status":"Draft",
-    "taxes_and_charges": customer.sales_item_tax_template,
+    #"taxes_and_charges": customer.sales_item_tax_template,
     "taxes":[],
     'selling_price_list': price_list,
     'price_list_currency': price_list_currency,
