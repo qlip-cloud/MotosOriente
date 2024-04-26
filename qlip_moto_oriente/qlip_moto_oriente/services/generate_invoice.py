@@ -51,7 +51,9 @@ def generate_sales_invoice(values):
             'account': sal_in.debit_to,
             'credit_in_account_currency': sal_in.total,
             'party_type': 'Customer',
-            'party': customer.name
+            'party': customer.name,
+            'reference_type': 'Sales Invoice',
+				    'reference_name': sal_in.name
           })
   
   si = {
