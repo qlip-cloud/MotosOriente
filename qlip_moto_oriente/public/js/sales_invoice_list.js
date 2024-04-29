@@ -14,7 +14,7 @@ function open_detail_popup(){
     function search(dialog){
 
         let dfilters = {
-            "tipo_de_venta": ['not in', ["Compilado"]],
+            "compilado": 0,
             "status": ['not in', ["Draft", "Canceled"]]
         };
 
@@ -85,6 +85,13 @@ function open_detail_popup(){
                 fieldname: 'prefijo',
                 fieldtype: 'Select',
                 options:naming_series_options,
+                reqd:true,
+            },
+            {
+                label: 'Términos de pago',
+                fieldname: 'payment_terms_template',
+                fieldtype: 'Link',
+                options:'Payment Terms Template',
                 reqd:true,
             },
             {

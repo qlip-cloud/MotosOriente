@@ -33,7 +33,7 @@ def generate_sales_invoice(values):
     item = {
       'item_code':'',
       'item_name':sal_in.tipo_de_venta,
-      'rate':sal_in.total
+      'rate':sal_in.grand_total
     }
 
     if sal_in.tipo_de_venta == 'Motocicleta':
@@ -49,11 +49,10 @@ def generate_sales_invoice(values):
     
     journal_account.append({
             'account': sal_in.debit_to,
-            'credit_in_account_currency': sal_in.total,
+            'credit_in_account_currency': sal_in.grand_total,
             'party_type': 'Customer',
             'party': customer.name,
-            'reference_type': 'Sales Invoice',
-				    'reference_name': sal_in.name
+            'reference_type': 'Sales Invoice'
           })
   
   si = {
@@ -61,7 +60,7 @@ def generate_sales_invoice(values):
     'company': company,
     'customer': customer.name,
     'numero_de_placa':values.get('numero_de_placa'),
-    'tipo_de_venta':'Compilado',
+    'tipo_de_venta':'Motocicleta',
     'title': customer.customer_name,
     'naming_series': values.get('prefijo'),
     'customer_name':customer.customer_name,
@@ -70,13 +69,14 @@ def generate_sales_invoice(values):
     'posting_time': get_time(datetime.now()),
     'items':items,
     "status":"Draft",
-    #"taxes_and_charges": customer.sales_item_tax_template,
+    "compilado": 1,
     "taxes":[],
     'selling_price_list': price_list,
     'price_list_currency': price_list_currency,
-    'plc_conversion_rate': 1.0
+    'plc_conversion_rate': 1.0,
+    'payment_terms_template':values.get('payment_terms_template')
   }
-
+  
   try:
 
     si = frappe.get_doc(si)
@@ -118,11 +118,16 @@ def generate_sales_invoice(values):
 
       for ja in journal_account:
           total += ja.get('credit_in_account_currency')
+          ja['reference_name'] = r['sa_in_name']
           je.append('accounts', ja)
 
       je.append('accounts', {
         'account': values.get('cuenta'),
-        'debit_in_account_currency': total
+        'debit_in_account_currency': total,
+        'party_type': 'Customer',
+        'party': customer.name,
+        'reference_type': 'Sales Invoice',
+        'reference_name': r['sa_in_name']
       })
 
       je.flags.ignore_mandatory = True
