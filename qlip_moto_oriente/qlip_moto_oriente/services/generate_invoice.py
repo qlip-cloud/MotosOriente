@@ -52,7 +52,8 @@ def generate_sales_invoice(values):
             'credit_in_account_currency': sal_in.grand_total,
             'party_type': 'Customer',
             'party': customer.name,
-            'reference_type': 'Sales Invoice'
+            'reference_type': 'Sales Invoice',
+	    'reference_name': sal_in.name
           })
   
   si = {
@@ -118,16 +119,16 @@ def generate_sales_invoice(values):
 
       for ja in journal_account:
           total += ja.get('credit_in_account_currency')
-          ja['reference_name'] = r['sa_in_name']
+          #ja['reference_name'] = r['sa_in_name']
           je.append('accounts', ja)
 
       je.append('accounts', {
         'account': values.get('cuenta'),
         'debit_in_account_currency': total,
         'party_type': 'Customer',
-        'party': customer.name,
-        'reference_type': 'Sales Invoice',
-        'reference_name': r['sa_in_name']
+        'party': customer.name
+        #'reference_type': 'Sales Invoice',
+        #'reference_name': r['sa_in_name']
       })
 
       je.flags.ignore_mandatory = True
