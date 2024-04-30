@@ -15,7 +15,7 @@ function open_detail_popup(){
 
         let dfilters = {
             "compilado": 0,
-            "status": ['not in', ["Draft", "Canceled"]]
+            "status": ['not in', ["Draft", "Cancelled"]]
         };
 
         if(dialog.layout.fields_dict.numero_de_placa.value)
