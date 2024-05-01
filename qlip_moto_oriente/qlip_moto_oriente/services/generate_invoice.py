@@ -38,7 +38,7 @@ def generate_sales_invoice(values):
     for team in sal_in.sales_team:
       if len(last_sales_teams_name) == 0:
         last_sales_teams_name.append({
-          'sales_person':team.sales_person
+          'sales_person':team.sales_person,
           'allocated_percentage':team.allocated_percentage
         })
         sales_team_is_equal = True
