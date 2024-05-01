@@ -36,11 +36,11 @@ def generate_sales_invoice(values):
     sal_in = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
 
     for team in sal_in.sales_team:
-      if len(last_sales_teams_name) == 0:
+      if len(last_sales_teams_name) ==s 0:
         last_sales_teams_name.append(team)
         sales_team_is_equal = True
       if len(last_sales_teams_name) > 0:
-        if last_sales_teams_name[0].sales_person.name != team.sales_person.name or last_sales_teams_name[0].sales_person.allocated_percentage != team.sales_person.allocated_percentage:
+        if last_sales_teams_name[0].sales_person != team.sales_person or last_sales_teams_name[0].allocated_percentage != team.allocated_percentage:
           sales_team_is_equal = False
 
     if not last_cl_referido:
