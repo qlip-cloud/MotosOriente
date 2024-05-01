@@ -43,7 +43,7 @@ def generate_sales_invoice(values):
         })
         sales_team_is_equal = True
       if len(last_sales_teams_name) > 0:
-        if last_sales_teams_name[0].sales_person != team.sales_person or last_sales_teams_name[0].allocated_percentage != team.allocated_percentage:
+        if last_sales_teams_name[0].get('sales_person') != team.sales_person or last_sales_teams_name[0].get('allocated_percentage') != team.allocated_percentage:
           sales_team_is_equal = False
 
     if not last_cl_referido:
