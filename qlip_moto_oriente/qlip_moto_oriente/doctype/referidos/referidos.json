@@ -1,0 +1,76 @@
+{
+ "actions": [],
+ "creation": "2024-04-30 20:57:14.473217",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "identificacion_tributaria",
+  "direccion",
+  "correo_electronico",
+  "column_break_4",
+  "nombre_referido",
+  "telefono",
+  "celular"
+ ],
+ "fields": [
+  {
+   "fieldname": "identificacion_tributaria",
+   "fieldtype": "Data",
+   "label": "Identificacion Tributaria"
+  },
+  {
+   "fieldname": "direccion",
+   "fieldtype": "Data",
+   "label": "Direccion"
+  },
+  {
+   "fieldname": "correo_electronico",
+   "fieldtype": "Data",
+   "label": "Correo electronico"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "nombre_referido",
+   "fieldtype": "Data",
+   "label": "Nombre referido"
+  },
+  {
+   "fieldname": "telefono",
+   "fieldtype": "Data",
+   "label": "Telefono"
+  },
+  {
+   "fieldname": "celular",
+   "fieldtype": "Data",
+   "label": "Celular"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-04-30 20:57:14.473217",
+ "modified_by": "Administrator",
+ "module": "Qlip Moto Oriente",
+ "name": "Referidos",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

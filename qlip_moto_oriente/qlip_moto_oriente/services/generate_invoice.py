@@ -27,8 +27,29 @@ def generate_sales_invoice(values):
   company = frappe.defaults.get_user_default('Company')
   price_list, price_list_currency = frappe.db.get_values("Price List", {"selling": 1}, ['name', 'currency'])[0]
 
+  sales_team_is_equal = False
+  last_sales_teams_name = []
+  cl_referido_is_equal = False
+  last_cl_referido = ''
+
   for sales_invoice in values.get('table_sales_invoice'):
     sal_in = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
+
+    for team in sal_in.sales_team:
+      if len(last_sales_teams_name) == 0:
+        last_sales_teams_name.append(team)
+        sales_team_is_equal = True
+      if len(last_sales_teams_name) > 0:
+        if last_sales_teams_name[0].sales_person.name != team.sales_person.name or last_sales_teams_name[0].sales_person.allocated_percentage != team.sales_person.allocated_percentage:
+          sales_team_is_equal = False
+
+    if not last_cl_referido:
+      if sal_in.cl_referido:
+        cl_referido_is_equal = True
+        last_cl_referido = sal_in.cl_referido
+    else:
+      if last_cl_referido != sal_in.cl_referido:
+        cl_referido_is_equal = False
 
     item = {
       'item_code':'',
@@ -53,7 +74,7 @@ def generate_sales_invoice(values):
             'party_type': 'Customer',
             'party': customer.name,
             'reference_type': 'Sales Invoice',
-	    'reference_name': sal_in.name
+	          'reference_name': sal_in.name
           })
   
   si = {
@@ -75,7 +96,9 @@ def generate_sales_invoice(values):
     'selling_price_list': price_list,
     'price_list_currency': price_list_currency,
     'plc_conversion_rate': 1.0,
-    'payment_terms_template':values.get('payment_terms_template')
+    'payment_terms_template':values.get('payment_terms_template'),
+    'sales_team': last_sales_teams_name if sales_team_is_equal else [],
+    'cl_referido': last_cl_referido if cl_referido_is_equal else ''
   }
   
   try:
@@ -83,6 +106,7 @@ def generate_sales_invoice(values):
     si = frappe.get_doc(si)
     si.set_missing_values(True)
     si.calculate_taxes_and_totals()
+    si.cl_valor_consolidado = si.grand_total
     si.insert()
     frappe.flags.in_import = False
 
