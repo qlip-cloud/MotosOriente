@@ -57,7 +57,7 @@ def generate_sales_invoice(values):
     item = {
       'item_code':'',
       'item_name':sal_in.tipo_de_venta,
-      'rate':sal_in.grand_total
+      'rate':sal_in.rounded_total
     }
 
     if sal_in.tipo_de_venta == 'Motocicleta':
@@ -73,7 +73,7 @@ def generate_sales_invoice(values):
     
     journal_account.append({
             'account': sal_in.debit_to,
-            'credit_in_account_currency': sal_in.grand_total,
+            'credit_in_account_currency': sal_in.rounded_total,
             'party_type': 'Customer',
             'party': customer.name,
             'reference_type': 'Sales Invoice',
@@ -109,7 +109,7 @@ def generate_sales_invoice(values):
     si = frappe.get_doc(si)
     si.set_missing_values(True)
     si.calculate_taxes_and_totals()
-    si.cl_valor_consolidado = si.grand_total
+    si.cl_valor_consolidado = si.rounded_total
     si.insert()
     frappe.flags.in_import = False
 
@@ -146,7 +146,6 @@ def generate_sales_invoice(values):
 
       for ja in journal_account:
           total += ja.get('credit_in_account_currency')
-          #ja['reference_name'] = r['sa_in_name']
           je.append('accounts', ja)
 
       je.append('accounts', {
@@ -154,8 +153,6 @@ def generate_sales_invoice(values):
         'debit_in_account_currency': total,
         'party_type': 'Customer',
         'party': customer.name
-        #'reference_type': 'Sales Invoice',
-        #'reference_name': r['sa_in_name']
       })
 
       je.flags.ignore_mandatory = True
