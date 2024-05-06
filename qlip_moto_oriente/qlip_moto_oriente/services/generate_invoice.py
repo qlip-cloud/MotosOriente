@@ -8,7 +8,7 @@ from erpnext.accounts.party import get_party_account
 
 @frappe.whitelist()
 def generate_sales_invoice(values):
-  
+
   r ={
     'success_sa_in':False,
     'sa_in_name':'',
@@ -33,53 +33,65 @@ def generate_sales_invoice(values):
   last_cl_referido = ''
 
   for sales_invoice in values.get('table_sales_invoice'):
-    sal_in = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
 
-    for team in sal_in.sales_team:
-      if len(last_sales_teams_name) == 0:
-        last_sales_teams_name.append({
-          'sales_person':team.sales_person,
-          'allocated_percentage':team.allocated_percentage
-        })
-        sales_team_is_equal = True
-      if len(last_sales_teams_name) > 0:
-        if last_sales_teams_name[0].get('sales_person') != team.sales_person or last_sales_teams_name[0].get('allocated_percentage') != team.allocated_percentage:
-          sales_team_is_equal = False
+    if sales_invoice.get('__checked'):
 
-    if not last_cl_referido:
-      if sal_in.cl_referido:
-        cl_referido_is_equal = True
-        last_cl_referido = sal_in.cl_referido
-    else:
-      if last_cl_referido != sal_in.cl_referido:
-        cl_referido_is_equal = False
+      sal_in = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
 
-    item = {
-      'item_code':'',
-      'item_name':sal_in.tipo_de_venta,
-      'rate':sal_in.rounded_total
-    }
-
-    if sal_in.tipo_de_venta == 'Motocicleta':
-      item['item_code'] = 'MOTOCICLETA'
-
-    if sal_in.tipo_de_venta == 'Mostrador':
-      item['item_code'] = 'MOSTRADOR'
-
-    if sal_in.tipo_de_venta == 'Servicio Mantenimiento':
-      item['item_code'] = 'SERVICIO MANTENIMIENTO'
-
-    items.append(item)
-    
-    journal_account.append({
-            'account': sal_in.debit_to,
-            'credit_in_account_currency': sal_in.rounded_total,
-            'party_type': 'Customer',
-            'party': customer.name,
-            'reference_type': 'Sales Invoice',
-	          'reference_name': sal_in.name
+      for team in sal_in.sales_team:
+        if len(last_sales_teams_name) == 0:
+          last_sales_teams_name.append({
+            'sales_person':team.sales_person,
+            'allocated_percentage':team.allocated_percentage
           })
+          sales_team_is_equal = True
+        if len(last_sales_teams_name) > 0:
+          if last_sales_teams_name[0].get('sales_person') != team.sales_person or last_sales_teams_name[0].get('allocated_percentage') != team.allocated_percentage:
+            sales_team_is_equal = False
+
+      if not last_cl_referido:
+        if sal_in.cl_referido:
+          cl_referido_is_equal = True
+          last_cl_referido = sal_in.cl_referido
+      else:
+        if last_cl_referido != sal_in.cl_referido:
+          cl_referido_is_equal = False
+
+      item = {
+        'item_code':'',
+        'item_name':sal_in.tipo_de_venta,
+        'rate':sal_in.rounded_total
+      }
+
+      if sal_in.tipo_de_venta == 'Motocicleta':
+        item['item_code'] = 'MOTOCICLETA'
+
+      if sal_in.tipo_de_venta == 'Mostrador':
+        item['item_code'] = 'MOSTRADOR'
+
+      if sal_in.tipo_de_venta == 'Servicio Mantenimiento':
+        item['item_code'] = 'SERVICIO MANTENIMIENTO'
+
+      items.append(item)
+      
+      journal_account.append({
+              'account': sal_in.debit_to,
+              'credit_in_account_currency': sal_in.rounded_total,
+              'party_type': 'Customer',
+              'party': customer.name,
+              'reference_type': 'Sales Invoice',
+              'reference_name': sal_in.name
+            })
   
+  if len(items) == 0:
+
+    frappe.msgprint(
+      msg='No hay datos suficientes para ejecutar proceso.',
+      title='Error de proceso'
+    )
+
+    return
+
   si = {
     'doctype': 'Sales Invoice',
     'company': company,
