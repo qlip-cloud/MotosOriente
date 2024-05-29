@@ -3313,7 +3313,7 @@
    "columns": 0,
    "creation": "2024-05-29 11:48:00.911595",
    "default": null,
-   "depends_on": "eval: doc.procesada = 1",
+   "depends_on": "eval: doc.procesada == 1",
    "description": null,
    "docstatus": 0,
    "dt": "Sales Invoice",
