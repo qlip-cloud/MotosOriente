@@ -42,7 +42,7 @@ def generate_sales_invoice(values):
         if len(last_sales_teams_name) == 0:
           last_sales_teams_name.append({
             'sales_person':team.sales_person,
-            'allocated_percentage':team.allocated_percentage
+            'allocated_percentage':team.allocated_percentage  
           })
           sales_team_is_equal = True
         if len(last_sales_teams_name) > 0:
@@ -60,7 +60,7 @@ def generate_sales_invoice(values):
       item = {
         'item_code':'',
         'item_name':sal_in.tipo_de_venta,
-        'rate':sal_in.rounded_total
+        'rate':sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total
       }
 
       if sal_in.tipo_de_venta == 'Motocicleta':
@@ -76,7 +76,7 @@ def generate_sales_invoice(values):
       
       journal_account.append({
               'account': sal_in.debit_to,
-              'credit_in_account_currency': sal_in.rounded_total,
+              'credit_in_account_currency': sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total,
               'party_type': 'Customer',
               'party': customer.name,
               'reference_type': 'Sales Invoice',
@@ -121,7 +121,7 @@ def generate_sales_invoice(values):
     si = frappe.get_doc(si)
     si.set_missing_values(True)
     si.calculate_taxes_and_totals()
-    si.cl_valor_consolidado = si.rounded_total
+    si.cl_valor_consolidado = si.grand_total if si.disable_rounded_total else si.rounded_total
     si.insert()
     frappe.flags.in_import = False
 
