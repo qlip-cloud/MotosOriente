@@ -42,7 +42,7 @@ def generate_sales_invoice(values):
         if len(last_sales_teams_name) == 0:
           last_sales_teams_name.append({
             'sales_person':team.sales_person,
-            'allocated_percentage':team.allocated_percentage
+            'allocated_percentage':team.allocated_percentage  
           })
           sales_team_is_equal = True
         if len(last_sales_teams_name) > 0:
@@ -181,5 +181,11 @@ def generate_sales_invoice(values):
       frappe.log_error(message=frappe.get_traceback(), title="qlip_moto_oriente")
       frappe.db.rollback()
 
+    for sales_invoice in values.get('table_sales_invoice'):
+      if sales_invoice.get('__checked'):
+        sal_in = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
+        sal_in.procesada = 1
+        sal_in.referencia = r['sa_in_name']
+        
   return r
 	
