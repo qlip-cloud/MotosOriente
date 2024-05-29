@@ -186,6 +186,7 @@ def generate_sales_invoice(values):
         sal_in = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
         sal_in.procesada = 1
         sal_in.referencia = r['sa_in_name']
-        
+        sal_in.save()
+
   return r
 	
