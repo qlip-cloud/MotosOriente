@@ -181,5 +181,12 @@ def generate_sales_invoice(values):
       frappe.log_error(message=frappe.get_traceback(), title="qlip_moto_oriente")
       frappe.db.rollback()
 
+    for sales_invoice in values.get('table_sales_invoice'):
+      if sales_invoice.get('__checked'):
+        salin = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
+        salin.procesada = 1
+        salin.referencia = r['sa_in_name']
+        salin.save()
+
   return r
 	
