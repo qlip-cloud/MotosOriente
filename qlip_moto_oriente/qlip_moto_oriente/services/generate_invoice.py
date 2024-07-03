@@ -32,13 +32,12 @@ def generate_sales_invoice(values):
   cl_referido_is_equal = False
   last_cl_referido = ''
 
-  for sales_invoice in values.get('table_sales_invoice'):
+  for sales_invoice in filter(lambda x: x.status != 'Return', values.get('table_sales_invoice')):
 
     if sales_invoice.get('__checked'):
-      
+
       sal_in = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
 
-        
       for team in sal_in.sales_team:
         if len(last_sales_teams_name) == 0:
           last_sales_teams_name.append({
@@ -61,7 +60,8 @@ def generate_sales_invoice(values):
       item = {
         'item_code':'',
         'item_name':sal_in.tipo_de_venta,
-        'rate':sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total
+        'rate':sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total,
+        'reference':sal_in.name
       }
 
       if sal_in.tipo_de_venta == 'Motocicleta':
@@ -75,25 +75,32 @@ def generate_sales_invoice(values):
 
       items.append(item)
       
-      if sal_in.status != 'Return':
-        journal_account.append({
-                'account': sal_in.debit_to,
-                'credit_in_account_currency': sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total,
-                'party_type': 'Customer',
-                'party': customer.name,
-                'reference_type': 'Sales Invoice',
-                'reference_name': sal_in.name
-              })
-      else:
-        journal_account.append({
-                'account': sal_in.debit_to,
-                'debit_in_account_currency': sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total,
-                'party_type': 'Customer',
-                'party': customer.name,
-                'reference_type': 'Sales Invoice',
-                'reference_name': sal_in.name
-              })
-  
+      journal_account.append({
+              'account': sal_in.debit_to,
+              'credit_in_account_currency': sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total,
+              'party_type': 'Customer',
+              'party': customer.name,
+              'reference_type': 'Sales Invoice',
+              'reference_name': sal_in.name
+            })
+      
+  for sales_invoice in filter(lambda x: x.status == 'Return', values.get('table_sales_invoice')):
+
+    if sales_invoice.get('__checked'):
+
+      sal_in_re = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
+      r_total = sal_in_re.grand_total if sal_in_re.disable_rounded_total else sal_in_re.rounded_total
+
+      for i in items:
+        if i.reference == sal_in_re.return_against:
+          i.rate -= r_total
+        
+        del i.reference
+
+      for j in journal_account:
+        if j.reference_name == sal_in_re.return_against:
+          j.credit_in_account_currency -=  r_total
+
   if len(items) == 0:
 
     frappe.msgprint(
