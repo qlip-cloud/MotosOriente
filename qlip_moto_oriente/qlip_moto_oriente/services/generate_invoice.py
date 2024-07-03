@@ -35,9 +35,10 @@ def generate_sales_invoice(values):
   for sales_invoice in values.get('table_sales_invoice'):
 
     if sales_invoice.get('__checked'):
-
+      
       sal_in = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
 
+        
       for team in sal_in.sales_team:
         if len(last_sales_teams_name) == 0:
           last_sales_teams_name.append({
@@ -74,14 +75,24 @@ def generate_sales_invoice(values):
 
       items.append(item)
       
-      journal_account.append({
-              'account': sal_in.debit_to,
-              'credit_in_account_currency': sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total,
-              'party_type': 'Customer',
-              'party': customer.name,
-              'reference_type': 'Sales Invoice',
-              'reference_name': sal_in.name
-            })
+      if sal_in.status != 'Return':
+        journal_account.append({
+                'account': sal_in.debit_to,
+                'credit_in_account_currency': sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total,
+                'party_type': 'Customer',
+                'party': customer.name,
+                'reference_type': 'Sales Invoice',
+                'reference_name': sal_in.name
+              })
+      else:
+        journal_account.append({
+                'account': sal_in.debit_to,
+                'debit_in_account_currency': sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total,
+                'party_type': 'Customer',
+                'party': customer.name,
+                'reference_type': 'Sales Invoice',
+                'reference_name': sal_in.name
+              })
   
   if len(items) == 0:
 
