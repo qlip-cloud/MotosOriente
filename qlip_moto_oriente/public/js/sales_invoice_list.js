@@ -26,7 +26,7 @@ function open_detail_popup(){
             dfilters['customer'] = dialog.layout.fields_dict.cliente.value
 
         if(Object.keys(dfilters).length > 0){
-            frappe.db.get_list('Sales Invoice', { filters:dfilters, fields:['name', 'title', 'status', 'base_grand_total', 'customer', 'numero_de_placa', 'tipo_de_venta']}).then((result)=>{
+            frappe.db.get_list('Sales Invoice', { filters:dfilters, fields:['name', 'title', 'status', 'base_grand_total', 'customer', 'numero_de_placa', 'tipo_de_venta', 'is_return']}).then((result)=>{
                 
                 result.forEach(element => {
                     element.status = frappe._(element.status)
