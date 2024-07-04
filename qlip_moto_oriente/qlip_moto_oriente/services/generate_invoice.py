@@ -94,8 +94,6 @@ def generate_sales_invoice(values):
       for i in items:
         if i.get('reference') == sal_in_re.return_against:
           i['rate'] -= r_total
-        
-        del i['reference']
 
       for j in journal_account:
         if j.get('reference_name') == sal_in_re.return_against:
