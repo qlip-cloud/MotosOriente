@@ -111,6 +111,7 @@ function open_detail_popup(){
                     { fieldname: 'name', fieldtype: 'Link', in_list_view: 1, label: 'Nombre', options:'Sales Invoice'},
                     { fieldname: 'numero_de_placa', fieldtype: 'Data', in_list_view: 1, label: 'Número de Placa'},
                     { fieldname: 'tipo_de_venta', fieldtype: 'Data', in_list_view: 1, label: 'Tipo de Venta'}
+                    { fieldname: 'is_return', fieldtype: 'Data', in_list_view: 1, label: 'Es devolución', disabled:1}
                 ]
             }
         ],
