@@ -32,7 +32,7 @@ def generate_sales_invoice(values):
   cl_referido_is_equal = False
   last_cl_referido = ''
 
-  for sales_invoice in filter(lambda x: not x.get('is_return'), values.get('table_sales_invoice')):
+  for sales_invoice in filter(lambda x: x.get('is_return') != 1, values.get('table_sales_invoice')):
 
     if sales_invoice.get('__checked'):
 
@@ -84,7 +84,7 @@ def generate_sales_invoice(values):
               'reference_name': sal_in.name
             })
       
-  for sales_invoice in filter(lambda x: x.get('is_return'), values.get('table_sales_invoice')):
+  for sales_invoice in filter(lambda x: x.get('is_return') == 1, values.get('table_sales_invoice')):
 
     if sales_invoice.get('__checked'):
 
