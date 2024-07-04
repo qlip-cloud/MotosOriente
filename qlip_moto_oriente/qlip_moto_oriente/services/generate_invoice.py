@@ -85,20 +85,20 @@ def generate_sales_invoice(values):
               'reference_name': sal_in.name
             })
       
-  for sales_invoice in filter(lambda x: x.get('is_return') == 1, values.get('table_sales_invoice')):
+  for sales_invoice_re in filter(lambda x: x.get('is_return') == 1, values.get('table_sales_invoice')):
 
-    if sales_invoice.get('__checked'):
+    if sales_invoice_re.get('__checked'):
 
-      sal_in_re = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
+      sal_in_re = frappe.get_doc('Sales Invoice', sales_invoice_re.get('name'))
       r_total = sal_in_re.grand_total if sal_in_re.disable_rounded_total else sal_in_re.rounded_total
 
       for i in items:
         if i.get('reference') == sal_in_re.return_against:
-          i['rate'] -= r_total
+          i['rate'] = i['rate'] - r_total
 
       for j in journal_account:
         if j.get('reference_name') == sal_in_re.return_against:
-          j['credit_in_account_currency'] -=  r_total
+          j['credit_in_account_currency'] =  j['credit_in_account_currency']  - r_total
 
   if len(items) == 0:
 
