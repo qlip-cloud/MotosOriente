@@ -32,8 +32,7 @@ def generate_sales_invoice(values):
   cl_referido_is_equal = False
   last_cl_referido = ''
 
-  for sales_invoice in filter(lambda x: x.get('is_return') == 0
-                              , values.get('table_sales_invoice')):
+  for sales_invoice in values.get('table_sales_invoice'):
 
     if sales_invoice.get('__checked'):
 
@@ -62,7 +61,7 @@ def generate_sales_invoice(values):
         'item_code':'',
         'item_name':sal_in.tipo_de_venta,
         'rate':sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total,
-        'reference':sal_in.name
+        'reference':sal_in.return_against if sales_invoice.get('is_return') else sal_in.name
       }
 
       if sal_in.tipo_de_venta == 'Motocicleta':
@@ -76,29 +75,37 @@ def generate_sales_invoice(values):
 
       items.append(item)
       
-      journal_account.append({
-              'account': sal_in.debit_to,
-              'credit_in_account_currency': sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total,
-              'party_type': 'Customer',
-              'party': customer.name,
-              'reference_type': 'Sales Invoice',
-              'reference_name': sal_in.name
-            })
+      if sales_invoice.get('is_return') == 0:
+        journal_account.append({
+                'account': sal_in.debit_to,
+                'credit_in_account_currency': abs(sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total),
+                'party_type': 'Customer',
+                'party': customer.name,
+                'reference_type': 'Sales Invoice'
+              })
+      else:
+        journal_account.append({
+                  'account': sal_in.debit_to,
+                  'debit_in_account_currency': abs(sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total),
+                  'party_type': 'Customer',
+                  'party': customer.name,
+                  'reference_type': 'Sales Invoice'
+                })
       
-  for sales_invoice_re in filter(lambda x: x.get('is_return') == 1, values.get('table_sales_invoice')):
+  # for sales_invoice_re in filter(lambda x: x.get('is_return') == 1, values.get('table_sales_invoice')):
 
-    if sales_invoice_re.get('__checked'):
+  #   if sales_invoice_re.get('__checked'):
 
-      sal_in_re = frappe.get_doc('Sales Invoice', sales_invoice_re.get('name'))
-      r_total = sal_in_re.grand_total if sal_in_re.disable_rounded_total else sal_in_re.rounded_total
+  #     sal_in_re = frappe.get_doc('Sales Invoice', sales_invoice_re.get('name'))
+  #     r_total = sal_in_re.grand_total if sal_in_re.disable_rounded_total else sal_in_re.rounded_total
 
-      for i in items:
-        if i.get('reference') == sal_in_re.return_against:
-          i['rate'] = i['rate'] - r_total
+  #     for i in items:
+  #       if i.get('reference') == sal_in_re.return_against:
+  #         i['rate'] = i['rate'] - r_total
 
-      for j in journal_account:
-        if j.get('reference_name') == sal_in_re.return_against:
-          j['credit_in_account_currency'] =  j['credit_in_account_currency']  - r_total
+  #     for j in journal_account:
+  #       if j.get('reference_name') == sal_in_re.return_against:
+  #         j['credit_in_account_currency'] =  j['credit_in_account_currency']  - r_total
 
   if len(items) == 0:
 
@@ -145,16 +152,15 @@ def generate_sales_invoice(values):
     r['success_sa_in'] = True
     r['sa_in_name'] = si.name
 
+    
+
   except frappe.exceptions.DuplicateEntryError as ex:
-    print(ex)
     frappe.log_error(message=frappe.get_traceback(), title="qlip_moto_oriente")
     frappe.db.rollback()
   except frappe.exceptions.UniqueValidationError as ex:
-    print(ex)
     frappe.log_error(message=frappe.get_traceback(), title="qlip_moto_oriente")
     frappe.db.rollback()
   except Exception as ex:
-    print(ex)
     frappe.log_error(message=frappe.get_traceback(), title="qlip_moto_oriente")
     frappe.db.rollback()
   
@@ -174,7 +180,10 @@ def generate_sales_invoice(values):
       total = 0
 
       for ja in journal_account:
-          total += ja.get('credit_in_account_currency')
+          if ja.get('credit_in_account_currency', None):
+            total += ja.get('credit_in_account_currency')
+          if ja.get('debit_in_account_currency', None):
+            total -= ja.get('debit_in_account_currency')
           je.append('accounts', ja)
 
       je.append('accounts', {
@@ -192,7 +201,6 @@ def generate_sales_invoice(values):
       r['jo_en_name'] = je.name
 
     except Exception as ex:
-      print(ex)
       r['success_jo_en'] = False
       r['success_sa_in'] = False
       frappe.log_error(message=frappe.get_traceback(), title="qlip_moto_oriente")
