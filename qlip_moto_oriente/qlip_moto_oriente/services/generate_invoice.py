@@ -84,8 +84,8 @@ def generate_sales_invoice(values):
               'reference_type': 'Sales Invoice'
             })
 
-  sorted(items, key=lambda x:x['rate'], reverse=True)
-  sorted(journal_account, key=lambda x:x['credit_in_account_currency'], reverse=True)
+  items = sorted(items, key=lambda x:x['rate'], reverse=True)
+  journal_account = sorted(journal_account, key=lambda x:x['credit_in_account_currency'], reverse=True)
 
   for sales_invoice_ret in filter(lambda x:x.get('is_return') == 1, values.get('table_sales_invoice')):
 
