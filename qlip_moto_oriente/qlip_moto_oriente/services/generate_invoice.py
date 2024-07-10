@@ -81,7 +81,8 @@ def generate_sales_invoice(values):
               'credit_in_account_currency': abs(sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total),
               'party_type': 'Customer',
               'party': customer.name,
-              'reference_type': 'Sales Invoice'
+              'reference_type': 'Sales Invoice',
+              'reference_name': sal_in.name
             })
 
   items = sorted(items, key=lambda x:x['rate'], reverse=True)
@@ -94,7 +95,15 @@ def generate_sales_invoice(values):
       sal_in_ret = frappe.get_doc('Sales Invoice', sales_invoice_ret.get('name'))
       sal_in_ret_amount = abs(sal_in_ret.grand_total if sal_in_ret.disable_rounded_total else sal_in_ret.rounded_total)
       items[0]['rate'] = items[0]['rate'] - sal_in_ret_amount
-      journal_account[0]['credit_in_account_currency'] = journal_account[0]['credit_in_account_currency'] - sal_in_ret_amount
+      
+      journal_account.append({
+              'account': sal_in_ret.debit_to,
+              'debit_in_account_currency': abs(sal_in_ret.grand_total if sal_in_ret.disable_rounded_total else sal_in_ret.rounded_total),
+              'party_type': 'Customer',
+              'party': customer.name,
+              'reference_type': 'Sales Invoice',
+              'reference_name': sal_in_ret.name
+            })
 
   if len(items) == 0:
 
@@ -169,7 +178,11 @@ def generate_sales_invoice(values):
       total = 0
 
       for ja in journal_account:
-        total += ja.get('credit_in_account_currency')
+        if ja.get('credit_in_account_currency'):
+          total += ja.get('credit_in_account_currency')
+        if ja.get('debit_in_account_currency'):
+          total -= ja.get('debit_in_account_currency')
+
         je.append('accounts', ja)
 
       je.append('accounts', {
@@ -191,14 +204,13 @@ def generate_sales_invoice(values):
       r['success_sa_in'] = False
       frappe.log_error(message=frappe.get_traceback(), title="qlip_moto_oriente")
       frappe.db.rollback()
-
-    for sales_invoice in values.get('table_sales_invoice'):
-      if sales_invoice.get('__checked'):
-        if r['success_jo_en'] == True and r['success_sa_in'] == True:
-          salin = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
-          salin.procesada = 1
-          salin.referencia = r['sa_in_name']
-          salin.save()
+    else:
+      for sales_invoice in values.get('table_sales_invoice'):
+        if sales_invoice.get('__checked'):
+            salin = frappe.get_doc('Sales Invoice', sales_invoice.get('name'))
+            salin.procesada = 1
+            salin.referencia = r['sa_in_name']
+            salin.save()
 
   return r
 	
