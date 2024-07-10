@@ -81,8 +81,7 @@ def generate_sales_invoice(values):
               'credit_in_account_currency': abs(sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total),
               'party_type': 'Customer',
               'party': customer.name,
-              'reference_type': 'Sales Invoice',
-              'reference_name': sal_in.name
+              'reference_type': 'Sales Invoice'
             })
 
   items = sorted(items, key=lambda x:x['rate'], reverse=True)
