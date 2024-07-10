@@ -81,7 +81,8 @@ def generate_sales_invoice(values):
               'credit_in_account_currency': abs(sal_in.grand_total if sal_in.disable_rounded_total else sal_in.rounded_total),
               'party_type': 'Customer',
               'party': customer.name,
-              'reference_type': 'Sales Invoice'
+              'reference_type': 'Sales Invoice',
+              'reference_name': sal_in.name
             })
 
   items = sorted(items, key=lambda x:x['rate'], reverse=True)
@@ -95,7 +96,7 @@ def generate_sales_invoice(values):
       sal_in_ret_amount = abs(sal_in_ret.grand_total if sal_in_ret.disable_rounded_total else sal_in_ret.rounded_total)
       items[0]['rate'] = items[0]['rate'] - sal_in_ret_amount
       
-      if sales_invoice_ret.get("return_against", None):
+      if sal_in_ret.return_against:
         journal_account[0]['credit_in_account_currency'] =  journal_account[0]['credit_in_account_currency'] - sal_in_ret_amount
       else:
         journal_account.append({
