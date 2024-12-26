@@ -65,20 +65,30 @@ def exec():
     amount = 0
 
     for row in rows:
+        
+        payed = False
 
         if row.parent != parent:
             parent = row.parent
+            print(parent)
             amount = row.gle_entry_total_without_outstanding
-        
-        if row.payment_amount <= amount and amount > 0:
+            print(amount)
+            
+        if row.payment_amount <= amount and amount > 0 and not payed:
             row.paid_amount = row.payment_amount
             amount -= row.payment_amount
             row.outstanding = 0
+            payed = True
             
-        if row.payment_amount > amount and amount > 0:
+        if row.payment_amount > amount and amount > 0 and not payed:
             row.paid_amount = amount
             row.outstanding = row.payment_amount - amount
             amount -= amount
+            payed = True
+
+        if not payed:
+            row.outstanding = row.payment_amount
+            row.paid_amount = 0
         
         row.gle_entry_total_without_outstanding = amount
 
