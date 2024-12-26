@@ -70,12 +70,12 @@ def exec():
             parent = row.parent
             amount = row.gle_entry_total_without_outstanding
         
-        if row.payment_amount <= amount:
+        if row.payment_amount <= amount and amount > 0:
             row.paid_amount = row.payment_amount
             amount -= row.payment_amount
             row.outstanding = 0
             
-        if row.payment_amount > amount:
+        if row.payment_amount > amount and amount > 0:
             row.paid_amount = amount
             row.outstanding = row.payment_amount - amount
             amount -= amount
